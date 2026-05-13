@@ -1,0 +1,27 @@
+﻿src/
+  app/
+    providers/
+    router/
+    App.tsx
+    store.ts
+  entities/
+    cart/
+    order/
+    product/
+    user/
+  features/
+  pages/
+    cart/
+    account/
+    checkout/
+    catalog/
+    not-found/
+    orders/
+  shared/
+    api/
+    lib/
+    types/
+    ui/
+  widgets/
+    app-shell/
+    header/
