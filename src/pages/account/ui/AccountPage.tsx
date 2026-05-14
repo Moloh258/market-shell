@@ -182,10 +182,16 @@ export function AccountPage() {
     queryKey: queryKeys.currentUser,
     queryFn: getCurrentUser,
   });
+  const { data: user, error: userError, isLoading: isUserLoading } = userQuery;
   const addressesQuery = useQuery({
     queryKey: queryKeys.userAddresses,
     queryFn: getUserAddresses,
   });
+  const {
+    data: addresses = [],
+    error: addressesError,
+    isLoading: isAddressesLoading,
+  } = addressesQuery;
 
   const updateProfileMutation = useMutation({
     mutationFn: updateUserProfile,
@@ -193,29 +199,49 @@ export function AccountPage() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.currentUser });
     },
   });
+  const {
+    error: updateProfileError,
+    isError: isUpdateProfileError,
+    isPending: isUpdateProfilePending,
+  } = updateProfileMutation;
   const addAddressMutation = useMutation({
     mutationFn: addAddress,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.userAddresses });
     },
   });
+  const {
+    error: addAddressError,
+    isError: isAddAddressError,
+    isPending: isAddAddressPending,
+  } = addAddressMutation;
   const updateAddressMutation = useMutation({
     mutationFn: updateAddress,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.userAddresses });
     },
   });
+  const {
+    error: updateAddressError,
+    isError: isUpdateAddressError,
+    isPending: isUpdateAddressPending,
+  } = updateAddressMutation;
   const removeAddressMutation = useMutation({
     mutationFn: removeAddress,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.userAddresses });
     },
   });
+  const {
+    error: removeAddressError,
+    isError: isRemoveAddressError,
+    isPending: isRemoveAddressPending,
+  } = removeAddressMutation;
 
-  const isLoading = userQuery.isLoading || addressesQuery.isLoading;
-  const error = userQuery.error ?? addressesQuery.error;
+  const isAccountLoading = isUserLoading || isAddressesLoading;
+  const accountLoadError = userError ?? addressesError;
 
-  if (isLoading) {
+  if (isAccountLoading) {
     return (
       <section>
         <h1>Аккаунт</h1>
@@ -224,16 +250,22 @@ export function AccountPage() {
     );
   }
 
-  if (error || !userQuery.data) {
+  if (accountLoadError || !user) {
     return (
       <section>
         <h1>Аккаунт</h1>
-        <p role="alert">{getErrorMessage(error)}</p>
+        <p role="alert">{getErrorMessage(accountLoadError)}</p>
       </section>
     );
   }
 
-  const addresses = addressesQuery.data ?? [];
+  const addressPanelError =
+    addressesError ??
+    addAddressError ??
+    updateAddressError ??
+    removeAddressError;
+  const hasAddressPanelError =
+    isAddAddressError || isUpdateAddressError || isRemoveAddressError;
 
   return (
     <section>
@@ -245,12 +277,12 @@ export function AccountPage() {
             <p>Тестовые данные текущего покупателя marketplace.</p>
           </div>
           <ProfileForm
-            user={userQuery.data}
-            isSubmitting={updateProfileMutation.isPending}
+            user={user}
+            isSubmitting={isUpdateProfilePending}
             onSubmit={(payload) => updateProfileMutation.mutate(payload)}
           />
-          {updateProfileMutation.isError ? (
-            <p role="alert">{getErrorMessage(updateProfileMutation.error)}</p>
+          {isUpdateProfileError ? (
+            <p role="alert">{getErrorMessage(updateProfileError)}</p>
           ) : null}
         </section>
 
@@ -282,7 +314,7 @@ export function AccountPage() {
                   <AddressForm
                     address={address}
                     submitLabel="Обновить адрес"
-                    isSubmitting={updateAddressMutation.isPending}
+                    isSubmitting={isUpdateAddressPending}
                     onSubmit={(payload) =>
                       updateAddressMutation.mutateAsync({
                         id: address.id,
@@ -292,7 +324,7 @@ export function AccountPage() {
                   />
                   <button
                     type="button"
-                    disabled={removeAddressMutation.isPending}
+                    disabled={isRemoveAddressPending}
                     onClick={() => removeAddressMutation.mutate(address.id)}
                   >
                     Удалить адрес
@@ -307,23 +339,13 @@ export function AccountPage() {
           </div>
           <AddressForm
             submitLabel="Добавить адрес"
-            isSubmitting={addAddressMutation.isPending}
+            isSubmitting={isAddAddressPending}
             resetOnSuccess
             onSubmit={(payload) => addAddressMutation.mutateAsync(payload)}
           />
 
-          {addressesQuery.isError ||
-          addAddressMutation.isError ||
-          updateAddressMutation.isError ||
-          removeAddressMutation.isError ? (
-            <p role="alert">
-              {getErrorMessage(
-                addressesQuery.error ??
-                  addAddressMutation.error ??
-                  updateAddressMutation.error ??
-                  removeAddressMutation.error,
-              )}
-            </p>
+          {hasAddressPanelError ? (
+            <p role="alert">{getErrorMessage(addressPanelError)}</p>
           ) : null}
         </section>
       </div>

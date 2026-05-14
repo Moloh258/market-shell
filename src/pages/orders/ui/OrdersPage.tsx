@@ -20,24 +20,31 @@ export function OrdersPage() {
     queryKey: queryKeys.orders,
     queryFn: getOrders,
   });
+  const {
+    data: orders = [],
+    error: ordersError,
+    isError: isOrdersError,
+    isLoading: isOrdersLoading,
+    isSuccess: isOrdersSuccess,
+  } = ordersQuery;
 
   return (
     <section>
       <h1>Заказы</h1>
 
-      {ordersQuery.isLoading ? <p>Загружаем заказы...</p> : null}
+      {isOrdersLoading ? <p>Загружаем заказы...</p> : null}
 
-      {ordersQuery.isError ? (
-        <p role="alert">{getErrorMessage(ordersQuery.error)}</p>
+      {isOrdersError ? (
+        <p role="alert">{getErrorMessage(ordersError)}</p>
       ) : null}
 
-      {ordersQuery.isSuccess && ordersQuery.data.length === 0 ? (
+      {isOrdersSuccess && orders.length === 0 ? (
         <p>У вас пока нет заказов.</p>
       ) : null}
 
-      {ordersQuery.data && ordersQuery.data.length > 0 ? (
+      {orders.length > 0 ? (
         <ul className="item-list">
-          {ordersQuery.data.map((order) => (
+          {orders.map((order) => (
             <li key={order.id}>
               <div>
                 <strong>{order.id}</strong>

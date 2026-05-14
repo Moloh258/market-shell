@@ -28,6 +28,13 @@ export function CheckoutPage() {
     queryKey: queryKeys.userAddresses,
     queryFn: getUserAddresses,
   });
+  const {
+    data: addresses = [],
+    error: addressesError,
+    isError: isAddressesError,
+    isLoading: isAddressesLoading,
+    isSuccess: isAddressesSuccess,
+  } = addressesQuery;
 
   const {
     register,
@@ -51,25 +58,29 @@ export function CheckoutPage() {
       navigate(routePaths.orders);
     },
   });
+  const {
+    error: createOrderError,
+    isError: isCreateOrderError,
+    isPending: isCreateOrderPending,
+  } = createOrderMutation;
 
   if (cartItems.length === 0) {
     return <Navigate to={routePaths.cart} replace />;
   }
 
-  const addresses = addressesQuery.data ?? [];
   const hasAddresses = addresses.length > 0;
 
   return (
     <section>
       <h1>Оформление заказа</h1>
 
-      {addressesQuery.isLoading ? <p>Загружаем оформление...</p> : null}
+      {isAddressesLoading ? <p>Загружаем оформление...</p> : null}
 
-      {addressesQuery.isError ? (
-        <p role="alert">{getErrorMessage(addressesQuery.error)}</p>
+      {isAddressesError ? (
+        <p role="alert">{getErrorMessage(addressesError)}</p>
       ) : null}
 
-      {addressesQuery.isSuccess ? (
+      {isAddressesSuccess ? (
         <form
           className="page-grid"
           onSubmit={handleSubmit((values) => {
@@ -203,15 +214,15 @@ export function CheckoutPage() {
               должен проверить backend при реальном оформлении.
             </p>
 
-            {createOrderMutation.isError ? (
-              <p role="alert">{getErrorMessage(createOrderMutation.error)}</p>
+            {isCreateOrderError ? (
+              <p role="alert">{getErrorMessage(createOrderError)}</p>
             ) : null}
 
             <button
               type="submit"
-              disabled={!hasAddresses || createOrderMutation.isPending}
+              disabled={!hasAddresses || isCreateOrderPending}
             >
-              {createOrderMutation.isPending
+              {isCreateOrderPending
                 ? "Создаем заказ..."
                 : "Создать заказ"}
             </button>

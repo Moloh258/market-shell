@@ -27,9 +27,16 @@ export function CatalogPage() {
     queryKey: queryKeys.products,
     queryFn: getProducts,
   });
+  const {
+    data: productsData,
+    error: productsError,
+    isError: isProductsError,
+    isLoading: isProductsLoading,
+    isSuccess: isProductsSuccess,
+  } = productsQuery;
 
   const filteredProducts = useMemo(() => {
-    const products = productsQuery.data ?? [];
+    const products = productsData ?? [];
 
     return products.filter((product) => {
       const matchesQuery = product.title
@@ -39,7 +46,7 @@ export function CatalogPage() {
 
       return matchesQuery && matchesStock;
     });
-  }, [productsQuery.data, query, showOnlyInStock]);
+  }, [productsData, query, showOnlyInStock]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -65,13 +72,13 @@ export function CatalogPage() {
         </label>
       </div>
 
-      {productsQuery.isLoading ? <p>Загружаем товары...</p> : null}
+      {isProductsLoading ? <p>Загружаем товары...</p> : null}
 
-      {productsQuery.isError ? (
-        <p role="alert">{getErrorMessage(productsQuery.error)}</p>
+      {isProductsError ? (
+        <p role="alert">{getErrorMessage(productsError)}</p>
       ) : null}
 
-      {productsQuery.isSuccess && filteredProducts.length === 0 ? (
+      {isProductsSuccess && filteredProducts.length === 0 ? (
         <p>Товары не найдены.</p>
       ) : null}
 
