@@ -150,7 +150,7 @@ Subtotal корзины - только frontend UI preview. Реальный che
 
 ## Заметки по безопасности
 
-- Client cart totals и checkout subtotal - только UI previews, backend не должен им доверять.
+- Client cart totals и checkout subtotal - только UI previews, не server state.
 - Account и checkout payloads нужно валидировать runtime schemas перед отправкой.
 - Production backend должен проверять prices, stock, ownership, address, shipping, taxes и final total.
 - Secrets и AI provider keys нельзя хранить во frontend code.
