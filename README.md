@@ -84,7 +84,7 @@ npm run build
 
 ## Архитектура
 
-Проект использует легкую feature-sliced структуру:
+Проект использует не строгую каноническую FSD, а облегчённую layer-based структуру по мотивам FSD:
 
 - `app`: bootstrap приложения, providers, routing, Redux store
 - `pages`: route-level screens
